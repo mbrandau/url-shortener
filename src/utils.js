@@ -27,5 +27,6 @@ function getUserAgentData(userAgentString) {
 }
 
 module.exports = {
-    generateRandomId
+    generateRandomId,
+    getUserAgentData
 };
