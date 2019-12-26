@@ -1,0 +1,18 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "main": "src/db.js",
+  "repository": "git@github.com:mbrandau/url-shortener.git",
+  "author": "Maximilian Brandau <maximilian.brandau@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "apollo-server": "^2.9.14",
+    "apollo-server-express": "latest",
+    "express": "^4.17.1",
+    "graphql": "^14.5.8",
+    "graphql-iso-date": "^3.6.1",
+    "knex": "^0.20.4",
+    "pg": "^7.15.1",
+    "ua-parser-js": "^0.7.21"
+  }
+}
