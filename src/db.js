@@ -1,5 +1,5 @@
 module.exports = require('knex')({
     client: 'pg',
-    connection: process.env.POSTGRES || 'postgresql://root:root@localhost/urlshortener',
+    connection: process.env.POSTGRES,
     useNullAsDefault: true
 });

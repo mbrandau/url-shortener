@@ -118,7 +118,6 @@ const randomId = length => {
                         target, name,
                         updated_at: new Date()
                     }, linkFields);
-                console.log({rs});
                 return rs[0]
             }
         },
@@ -162,10 +161,10 @@ const randomId = length => {
                         utm_source: req.query['utm_source'],
                         utm_medium: req.query['utm_medium'],
                         utm_campaign: req.query['utm_campaign'],
-                    }).catch(console.log)
+                    })
                 } else next()
             })
     });
 
-    app.listen(process.env.PORT || 80, server => console.log(server));
+    app.listen(process.env.PORT || 80, ()=> console.log('Listening.'));
 })();
