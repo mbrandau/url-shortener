@@ -2,6 +2,8 @@ const {createLink, getAllLinks, getLinkById, getVisitsOfLink, updateLink, getTot
 const {GraphQLDateTime} = require('graphql-iso-date');
 const {gql} = require('apollo-server-express');
 const {linkColumns} = require('./constants');
+const {generateStatistics} = require('./statistics');
+const moment = require('moment');
 
 const typeDefs = gql`
     scalar DateTime
@@ -12,8 +14,9 @@ const typeDefs = gql`
         name: String
         updated_at: DateTime
         created_at: DateTime!
-        visits: [Visit!]
-        totalVisitsCount: Int!
+        visits: [Visit!]!
+        totalVisits: Int!
+        statistics(from: DateTime!, to: DateTime): Statistics!
     }
 
     type Visit {
@@ -35,9 +38,28 @@ const typeDefs = gql`
         utm_campaign: String
     }
 
+    type Statistics {
+        from: DateTime!
+        to: DateTime!
+        totalVisits: Int!
+        visits: [Visit!]!
+        browsers: [Percentage!]!
+        devices: [Percentage!]!
+        referrers: [Percentage!]!
+        utms: [Percentage!]!
+        visitsPerDaytime: [Percentage!]!
+        visitsPerWeekday: [Percentage!]!
+    }
+
+    type Percentage {
+        property: String!
+        percentage: Float
+    }
+
     type Query {
         links: [Link]
-        link(id: ID!): Link
+        link(id: ID!): Link,
+        statistics(linkId: ID!, from: DateTime!, to: DateTime!): Statistics
     }
 
     type Mutation {
@@ -50,6 +72,7 @@ const resolvers = {
     Query: {
         links: getAllLinks,
         link: (_, {id}) => getLinkById(id),
+        statistics: (_, {linkId, from, to}) => generateStatistics(linkId, from, to)
     },
     Mutation: {
         createLink: (_, {id, target, name}) => createLink(id, target, name),
@@ -57,7 +80,8 @@ const resolvers = {
     },
     Link: {
         visits: link => getVisitsOfLink(link.id),
-        totalVisitsCount: link => getTotalVisits(link.id)
+        totalVisits: link => getTotalVisits(link.id),
+        statistics: (link,{from,to}) => generateStatistics(link.id, from, to ||new Date()),
     },
     DateTime: GraphQLDateTime
 };

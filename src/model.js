@@ -14,7 +14,7 @@ async function getLinkById(id) {
 
 async function trackVisit(linkId, req, date) {
     const userAgentData = getUserAgentData(req.headers['user-agent']);
-    knex('visits').insert({
+    return knex('visits').insert({
         date,
         link: linkId,
         ...userAgentData,
@@ -58,6 +58,10 @@ async function getTotalVisits(id) {
     return rs[0].count;
 }
 
+async function getVisitsFromTo(id, from, to) {
+    return knex('visits').where('link', id).whereBetween('date', [from, to])
+}
+
 module.exports = {
     getAllLinks,
     getLinkById,
@@ -65,5 +69,6 @@ module.exports = {
     createLink,
     updateLink,
     getVisitsOfLink,
-    getTotalVisits
+    getTotalVisits,
+    getVisitsFromTo
 };

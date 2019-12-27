@@ -20,8 +20,9 @@ const {getLinkById, trackVisit} = require("./model");
         const id = req.path.substr(1);
         const link = await getLinkById(id);
         if (link) {
+            console.log(`${link.id} => ${link.target} from ${req.ip}`);
             res.redirect(link.target);
-            trackVisit(link.id, req, date);
+            trackVisit(link.id, req, date).catch(e => console.log(`Couldn‘t track visit for ${link.id}: ${e}`));
         } else {
             next()
         }
