@@ -1,8 +1,9 @@
-const {createLink, getAllLinks, getLinkById, getVisitsOfLink, updateLink, getTotalVisits} = require('./model');
+const {createLink, getAllLinks, getLinkById, getVisitsOfLink, updateLink, deleteLink, getTotalVisits} = require('./model');
 const {GraphQLDateTime} = require('graphql-iso-date');
 const {gql} = require('apollo-server-express');
 const {linkColumns} = require('./constants');
 const {generateStatistics} = require('./statistics');
+const {requireAuthorization} = require('./utils');
 const moment = require('moment');
 
 const typeDefs = gql`
@@ -57,7 +58,7 @@ const typeDefs = gql`
     }
 
     type Query {
-        links: [Link]
+        links: [Link!]!
         link(id: ID!): Link,
         statistics(linkId: ID!, from: DateTime!, to: DateTime!): Statistics
     }
@@ -65,23 +66,48 @@ const typeDefs = gql`
     type Mutation {
         createLink(target: String!, id: ID, name: String): Link
         updateLink(id: ID!, target: String, name: String): Link
+        deleteLink(id: ID!): Boolean!
     }
 `;
 
 const resolvers = {
     Query: {
-        links: getAllLinks,
-        link: (_, {id}) => getLinkById(id),
-        statistics: (_, {linkId, from, to}) => generateStatistics(linkId, from, to)
+        links: (root, args, ctx) => {
+            requireAuthorization(ctx.token, 'read');
+            return getAllLinks();
+        },
+        link: (root, {id}, ctx) => {
+            requireAuthorization(ctx.token, 'read');
+            return getLinkById(id);
+        }
     },
     Mutation: {
-        createLink: (_, {id, target, name}) => createLink(id, target, name),
-        updateLink: (_, {id, target, name}) => updateLink(id, target, name)
+        createLink: (_, {id, target, name}, ctx) => {
+            requireAuthorization(ctx.token, 'create');
+            return createLink(id, target, name);
+        },
+        updateLink: (_, {id, target, name}, ctx) => {
+            requireAuthorization(ctx.token, 'update');
+            return updateLink(id, target, name);
+        },
+        deleteLink: (_, {id}, ctx) => {
+            requireAuthorization(ctx.token, 'delete');
+            return deleteLink(id);
+        }
     },
     Link: {
-        visits: link => getVisitsOfLink(link.id),
-        totalVisits: link => getTotalVisits(link.id),
-        statistics: (link,{from,to}) => generateStatistics(link.id, from, to ||new Date()),
+        visits: (link, _, ctx) => {
+            requireAuthorization(ctx.token, 'read');
+            return getVisitsOfLink(link.id);
+        },
+        totalVisits: (link, _, ctx) => {
+            requireAuthorization(ctx.token, 'read');
+            return getTotalVisits(link.id);
+        },
+        statistics: (link, {from, to}, ctx) => {
+            requireAuthorization(ctx.token, 'read');
+            return generateStatistics(link.id, from, to || new Date());
+        }
     },
     DateTime: GraphQLDateTime
 };

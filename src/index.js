@@ -9,7 +9,13 @@ const {getLinkById, trackVisit} = require("./model");
 
     const server = new ApolloServer({
         typeDefs,
-        resolvers
+        resolvers,
+        context: (context => {
+            const token = context.req.headers['authentication'];
+            return {
+                token
+            }
+        })
     });
 
     const app = express();

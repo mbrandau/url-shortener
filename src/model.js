@@ -1,18 +1,24 @@
 const knex = require('./db');
-const {generateRandomId, getUserAgentData} = require('./utils');
+const {generateRandomId, getUserAgentData, sanitizeId} = require('./utils');
 const {linkColumns} = require('./constants');
+const config = require('../config');
 
 async function getAllLinks() {
-    return knex.select(linkColumns).from('links')
+    return knex('links')
+        .select(linkColumns)
+        .whereNull('deleted_at')
 }
 
 async function getLinkById(id) {
+    id = sanitizeId(id);
     return knex('links')
         .first(linkColumns)
         .where('id', id)
+        .whereNull('deleted_at')
 }
 
 async function trackVisit(linkId, req, date) {
+    linkId = sanitizeId(linkId);
     const userAgentData = getUserAgentData(req.headers['user-agent']);
     return knex('visits').insert({
         date,
@@ -26,6 +32,7 @@ async function trackVisit(linkId, req, date) {
 }
 
 async function createLink(id, target, name) {
+    id = sanitizeId(id);
     const rs = await knex('links')
         .returning(linkColumns)
         .insert({
@@ -39,8 +46,10 @@ async function createLink(id, target, name) {
 }
 
 async function updateLink(id, target, name) {
+    id = sanitizeId(id);
     const rs = await knex('links')
         .where('id', id)
+        .whereNull('deleted_at')
         .update({
             target,
             name,
@@ -49,17 +58,44 @@ async function updateLink(id, target, name) {
     return rs[0]
 }
 
+async function deleteLink(id) {
+    id = sanitizeId(id);
+    await knex('visits').where('link', id).delete();
+    if (config.preserveDeletedIds === true) {
+        await knex('links')
+            .where('id', id)
+            .whereNull('deleted_at')
+            .update({
+                deleted_at: new Date()
+            }, linkColumns);
+    } else {
+        await knex('links')
+            .where('id', id)
+            .delete();
+    }
+    return true
+}
+
 async function getVisitsOfLink(id) {
-    return knex('visits').where('link', id)
+    id = sanitizeId(id);
+    return knex('visits')
+        .where('link', id)
+        .whereNull('deleted_at');
 }
 
 async function getTotalVisits(id) {
-    const rs = await knex('visits').count('id').where('link', id);
+    id = sanitizeId(id);
+    const rs = await knex('visits')
+        .count('id')
+        .where('link', id);
     return rs[0].count;
 }
 
 async function getVisitsFromTo(id, from, to) {
-    return knex('visits').where('link', id).whereBetween('date', [from, to])
+    id = sanitizeId(id);
+    return knex('visits')
+        .where('link', id)
+        .whereBetween('date', [from, to])
 }
 
 module.exports = {
@@ -68,6 +104,7 @@ module.exports = {
     trackVisit,
     createLink,
     updateLink,
+    deleteLink,
     getVisitsOfLink,
     getTotalVisits,
     getVisitsFromTo

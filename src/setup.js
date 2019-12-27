@@ -7,6 +7,7 @@ module.exports = {
             table.string('target', 150);
             table.string('name', 50);
             table.timestamps(false, false);
+            table.dateTime('deleted_at').defaultTo(null);
         }).catch(console.log);
         await knex.schema.createTable('visits', table => {
             table.increments();

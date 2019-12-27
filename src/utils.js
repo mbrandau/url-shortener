@@ -1,14 +1,31 @@
 const userAgentParser = require('ua-parser-js');
+const {AuthenticationError} = require('apollo-server-errors');
+const config = require('../config');
 
-const alphabet = '123456789abcdefghkmnpqrstuvwxyz'.split('');
+const blacklistRegex = new RegExp(config.ids.generatorBlacklistRegex);
+const alphabet = config.ids.alphabet.split('');
 const generateRandomId = length => {
     let id = '';
     for (let i = 0; i < length; i++) {
-        const letter = alphabet[Math.round((alphabet.length - 1) * Math.random())];
+        const letter = alphabet[Math.floor((alphabet.length - 1) * Math.random())];
         id = id + letter;
     }
-    return id;
+
+    // Don’t use blacklisted ids
+    while (blacklistRegex.test(id) || config.ids.generatorBlacklist.indexOf(id) >= 0 || config.ids.generalBlacklist.indexOf(id) >= 0)
+        id = generateRandomId(length);
+
+    return sanitizeId(id);
 };
+
+function isAuthorized(token, action) {
+    if (config.access[action].indexOf('public') >= 0) return true;
+    return config.access[action].indexOf(token) >= 0;
+}
+
+function requireAuthorization(token, action) {
+    if (!isAuthorized(token, action)) throw new AuthenticationError('Not authorized');
+}
 
 function getUserAgentData(userAgentString) {
     const userAgent = userAgentParser(userAgentString);
@@ -26,7 +43,17 @@ function getUserAgentData(userAgentString) {
     }
 }
 
+function sanitizeId(id) {
+    if (typeof id !== 'string') return id;
+    if (config.ids.caseSensitive !== true) id = id.toLowerCase();
+    if (config.ids.generalBlacklist.indexOf(id) >= 0) throw new Error('id blacklisted');
+    return id;
+}
+
 module.exports = {
     generateRandomId,
-    getUserAgentData
+    isAuthorized,
+    requireAuthorization,
+    getUserAgentData,
+    sanitizeId
 };
