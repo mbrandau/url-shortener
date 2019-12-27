@@ -21,19 +21,19 @@ const {getLinkById, trackVisit} = require("./model");
     const app = express();
     await server.applyMiddleware({app});
 
-    app.use('/', (req, res) => {
-        res.redirect('https://github.com/mbrandau/url-shortener');
-    });
     app.use(async (req, res, next) => {
         const date = new Date();
         const id = req.path.substr(1);
-        const link = await getLinkById(id);
-        if (link) {
-            console.log(`${link.id} => ${link.target} from ${req.ip}`);
-            res.redirect(link.target);
-            trackVisit(link.id, req, date).catch(e => console.log(`Couldn‘t track visit for ${link.id}: ${e}`));
-        } else {
-            next()
+        if (id === '') next();
+        else {
+            const link = await getLinkById(id);
+            if (link) {
+                console.log(`${link.id} => ${link.target} from ${req.ip}`);
+                res.redirect(link.target);
+                trackVisit(link.id, req, date).catch(e => console.log(`Couldn‘t track visit for ${link.id}: ${e}`));
+            } else {
+                next()
+            }
         }
     });
     app.use((req, res, next) => {
