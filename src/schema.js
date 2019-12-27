@@ -60,7 +60,6 @@ const typeDefs = gql`
     type Query {
         links: [Link!]!
         link(id: ID!): Link,
-        statistics(linkId: ID!, from: DateTime!, to: DateTime!): Statistics
     }
 
     type Mutation {
@@ -106,7 +105,7 @@ const resolvers = {
         },
         statistics: (link, {from, to}, ctx) => {
             requireAuthorization(ctx.token, 'read');
-            return generateStatistics(link.id, from, to || new Date());
+            return generateStatistics(link.id, from || link.created_at, to || new Date());
         }
     },
     DateTime: GraphQLDateTime
