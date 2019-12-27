@@ -40,4 +40,4 @@ Default configuration:
 This URL shortener uses PostgreSQL as a database.
 You can set the connection string via the `POSTGRES` environment variable.
 The port can be configured via the `PORT` environment variable. (defaults to `80`)
-For a deployment using Docker see (Deploying with Docker Compose)[https://github.com/mbrandau/url-shortener/wiki/Deploying-with-Docker-Compose]
+For a deployment using Docker see [Deploying with Docker Compose](https://github.com/mbrandau/url-shortener/wiki/Deploying-with-Docker-Compose).
