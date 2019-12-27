@@ -1,4 +1,4 @@
-FROM node:13
+FROM node:13-alpine
 
 WORKDIR /usr/src/app
 COPY package.json .
@@ -8,4 +8,4 @@ RUN yarn
 COPY . .
 EXPOSE 80
 ENV PORT=80
-CMD node src/index.js
+CMD ["node","src/index.js"]
