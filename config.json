@@ -1,0 +1,16 @@
+{
+  "access": {
+    "create": ["public"],
+    "read": ["public"],
+    "update": [],
+    "delete": []
+  },
+  "ids": {
+    "alphabet": "123456789abcdefghkmnpqrstuvwxyz",
+    "caseSensitive": false,
+    "preserveDeleted": true,
+    "generatorBlacklist": [],
+    "generatorBlacklistRegex": "ad",
+    "generalBlacklist": [""]
+  }
+}
