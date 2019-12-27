@@ -21,6 +21,9 @@ const {getLinkById, trackVisit} = require("./model");
     const app = express();
     await server.applyMiddleware({app});
 
+    app.use('/', (req, res) => {
+        res.redirect('https://github.com/mbrandau/url-shortener');
+    });
     app.use(async (req, res, next) => {
         const date = new Date();
         const id = req.path.substr(1);
@@ -32,6 +35,12 @@ const {getLinkById, trackVisit} = require("./model");
         } else {
             next()
         }
+    });
+    app.use((req, res, next) => {
+        next(new Error('Not found'))
+    });
+    app.use((err, req, res, next) => {
+        res.send('Error: ' + err.message);
     });
 
     app.listen(process.env.PORT || 80, () => console.log('Listening.'));
