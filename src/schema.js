@@ -17,7 +17,7 @@ const typeDefs = gql`
         created_at: DateTime!
         visits: [Visit!]!
         totalVisits: Int!
-        statistics(from: DateTime!, to: DateTime): Statistics!
+        statistics(from: DateTime, to: DateTime): Statistics!
     }
 
     type Visit {
