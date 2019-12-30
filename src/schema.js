@@ -50,11 +50,17 @@ const typeDefs = gql`
         utms: [Percentage!]!
         visitsPerDaytime: [Percentage!]!
         visitsPerWeekday: [Percentage!]!
+        dates: [AbsoluteDataPoint!]!
     }
 
     type Percentage {
         property: String!
         percentage: Float
+    }
+    
+    type AbsoluteDataPoint {
+        name: String!
+        value: Int
     }
 
     type Query {

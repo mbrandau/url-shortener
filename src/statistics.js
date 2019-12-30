@@ -1,5 +1,6 @@
 const moment = require('moment');
 const {getVisitsFromTo} = require('./model');
+const {getDates} = require('./utils');
 
 async function generateStatistics(linkId, from, to) {
     const visits = await getVisitsFromTo(linkId, from, to);
@@ -8,6 +9,7 @@ async function generateStatistics(linkId, from, to) {
         devicesTotal = {},
         referrersTotal = {},
         utmsTotal = {},
+        daysTotal = {},
         daytimeTotal = {
             '0': 0,
             '1': 0,
@@ -43,6 +45,9 @@ async function generateStatistics(linkId, from, to) {
             5: 0,
             6: 0,
         };
+
+    getDates(from, to).forEach(date => daysTotal[moment(date).format('YYYY-MM-DD')] = 0);
+
     visits.forEach(visit => {
         const browser = `${visit.browserName}`;
         const device = `${visit.deviceType}`;
@@ -58,12 +63,20 @@ async function generateStatistics(linkId, from, to) {
         utmsTotal[utm]++;
         daytimeTotal[moment(visit.date).format('H')]++;
         weekdayTotal[moment(visit.date).format('E')]++;
+        daysTotal[moment(visit.date).format('YYYY-MM-DD')]++;
     });
 
     function toPercentages(totals) {
         return Object.keys(totals).map(property => ({
             property,
             percentage: totals[property] === 0 ? 0 : totals[property] / visits.length
+        }))
+    }
+
+    function toAbsolutes(totals) {
+        return Object.keys(totals).map(name => ({
+            name,
+            value: totals[name]
         }))
     }
 
@@ -77,7 +90,8 @@ async function generateStatistics(linkId, from, to) {
         referrers: toPercentages(referrersTotal),
         utms: toPercentages(utmsTotal),
         visitsPerDaytime: toPercentages(daytimeTotal),
-        visitsPerWeekday: toPercentages(weekdayTotal)
+        visitsPerWeekday: toPercentages(weekdayTotal),
+        dates: toAbsolutes(daysTotal)
     }
 }
 

@@ -50,10 +50,27 @@ function sanitizeId(id) {
     return id;
 }
 
+function addDays(date, days) {
+    const dat = new Date(date);
+    dat.setDate(dat.getDate() + days);
+    return dat;
+}
+
+function getDates(startDate, endDate) {
+    const dateArray = [];
+    let currentDate = startDate;
+    while (currentDate <= endDate) {
+        dateArray.push(currentDate);
+        currentDate = addDays(currentDate, 1);
+    }
+    return dateArray;
+}
+
 module.exports = {
     generateRandomId,
     isAuthorized,
     requireAuthorization,
     getUserAgentData,
-    sanitizeId
+    sanitizeId,
+    getDates
 };
