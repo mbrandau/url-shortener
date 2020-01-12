@@ -1,4 +1,6 @@
 # Headless URL shortener
+![Docker Pulls](https://img.shields.io/docker/pulls/mbrandau/url-shortener)
+![Libraries.io dependency status for GitHub repo](https://img.shields.io/librariesio/github/mbrandau/url-shortener)
 
 I couldn’t find an URL shortener that suited my needs, so I made one myself.
 It’s build with Node.js, GraphQL and PostgreSQL.
