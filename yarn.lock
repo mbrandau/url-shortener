@@ -401,9 +401,7 @@ apollo-server-types@^0.2.9:
     apollo-server-env "^2.4.3"
 
 apollo-server@^2.9.14:
-  version "2.9.14"
-  resolved "https://registry.npmjs.org/apollo-server/-/apollo-server-2.9.14.tgz#200e7bcb5239a9ffbc6959fc9647ce77cfbb60f3"
-  integrity sha512-qLog3R7zULliumwaDfqnGOIw1rMs2qVpqnYr8XhE17CMoLdhfrDPN2Y6EhgNmfSIVvMCSFD5SIgKcHf9pDMEow==
+  version "2.25.4"
   dependencies:
     apollo-server-core "^2.9.14"
     apollo-server-express "^2.9.14"
