@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Publish Docker
-      uses: elgohr/Publish-Docker-Github-Action@2.11
+      uses: elgohr/Publish-Docker-Github-Action@v5
       with:
         name: mbrandau/url-shortener
         username: mbrandau
